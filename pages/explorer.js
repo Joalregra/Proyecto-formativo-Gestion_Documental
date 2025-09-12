@@ -1,9 +1,7 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import Inbox from "@/components/Inbox/Inbox";
-import MailReader from "@/components/MailReader/MailReader";
 import {FunnelIcon, MagnifyingGlassIcon} from "@heroicons/react/24/solid";
-import ArchiveTable from "@/components/ArchiveTable/ArchiveTable";
+import ArchiveExplorer from "@/components/ArchiveExplorer/ArchiveExplorer";
 
 export default function Explorer() {
     return (
@@ -20,8 +18,10 @@ export default function Explorer() {
                         </div>
                         <button className="p-4 bg-gray-100 rounded-md hover:cursor-pointer"><FunnelIcon
                             className="size-5"></FunnelIcon></button>
+                        <button className="p-4 bg-gray-100 rounded-md hover:cursor-pointer"><FunnelIcon
+                            className="size-5"></FunnelIcon></button>
                     </div>
-                    <ArchiveTable />
+                    <ArchiveExplorer />
                 </div>
             </div>
 
