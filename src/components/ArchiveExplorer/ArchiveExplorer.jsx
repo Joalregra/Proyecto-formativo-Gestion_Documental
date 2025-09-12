@@ -20,7 +20,7 @@ export default function ArchiveExplorer() {
                 </tr>
                 </thead>
                 <tbody className="overflow-y-auto">
-                <tr className="odd:bg-gray-100 even:bg-gray-200 text-lg">
+                <tr className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black">
                     <th className="rounded-l-lg">
                         <label>
                             <FolderIcon className="size-10  fill-gray-700"></FolderIcon>
@@ -36,7 +36,7 @@ export default function ArchiveExplorer() {
                     </td>
 
                 </tr>
-                <tr className="odd:bg-gray-100 even:bg-gray-200 text-lg">
+                <tr className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black">
                     <th className="rounded-l-lg">
                         <label>
                             <FolderIcon className="size-10  fill-gray-700"></FolderIcon>
@@ -52,7 +52,7 @@ export default function ArchiveExplorer() {
                     </td>
 
                 </tr>
-                <tr className="odd:bg-gray-100 even:bg-gray-200 text-lg">
+                <tr className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black">
                     <th className="rounded-l-lg">
                         <label>
                             <FolderIcon className="size-10  fill-gray-700"></FolderIcon>

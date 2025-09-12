@@ -1,6 +1,6 @@
 export default function Navbar() {
     return (
-        <nav className="navbar bg-base-100 shadow-sm px-4 h-20">
+        <nav className="navbar bg-white shadow-sm px-4 h-20">
         <div className="flex-1">
             <a href="/"><img src="/gedocs-logo.svg" alt="gedocs logo"/></a>
         </div>
