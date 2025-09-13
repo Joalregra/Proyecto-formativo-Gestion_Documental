@@ -1,7 +1,5 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import Inbox from "@/components/Inbox/Inbox";
-import MailReader from "@/components/MailReader/MailReader";
 import {FunnelIcon, MagnifyingGlassIcon} from "@heroicons/react/24/solid";
 import ArchiveTable from "@/components/ArchiveTable/ArchiveTable";
 
@@ -18,7 +16,7 @@ export default function Archive() {
                                    className="input bg-gray-100 focus:outline-none focus:border-none border-none shadow-none w-full focus:shadow-none"/>
                             <MagnifyingGlassIcon className="size-5 mr-2"></MagnifyingGlassIcon>
                         </div>
-                        <button className="p-4 bg-gray-100 rounded-md hover:cursor-pointer"><FunnelIcon
+                        <button className="p-4 bg-gray-100  rounded-md hover:cursor-pointer"><FunnelIcon
                             className="size-5"></FunnelIcon></button>
                     </div>
                     <ArchiveTable />
