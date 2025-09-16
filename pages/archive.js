@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import {FunnelIcon, MagnifyingGlassIcon} from "@heroicons/react/24/solid";
+import {FunnelIcon, MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import ArchiveTable from "@/components/ArchiveTable/ArchiveTable";
 
 export default function Archive() {

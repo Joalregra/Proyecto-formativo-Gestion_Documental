@@ -6,6 +6,7 @@ import {
 
 } from "@heroicons/react/24/solid";
 
+
 export default function ArchiveExplorer() {
     return (
         <div className="overflow-x-auto w-full">
@@ -48,7 +49,7 @@ export default function ArchiveExplorer() {
                     <td>--</td>
                     <td>Carpeta</td>
                     <td  className="flex justify-center gap-15 rounded-r-lg">
-                        <ArrowDownTrayIcon className="size-8  fill-gray-700"></ArrowDownTrayIcon>
+                        <ArrowDownTrayIcon className="size-8  fill-gray-700 "></ArrowDownTrayIcon>
                         <EllipsisVerticalIcon className="size-8  fill-gray-700"></EllipsisVerticalIcon>
                     </td>
 

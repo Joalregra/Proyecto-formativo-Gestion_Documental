@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar/Navbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import {ChevronRightIcon,FunnelIcon, MagnifyingGlassIcon, Squares2X2Icon} from "@heroicons/react/24/solid";
+import {ChevronRightIcon,FunnelIcon, MagnifyingGlassIcon, Squares2X2Icon} from "@heroicons/react/24/outline";
 import ArchiveExplorer from "@/components/ArchiveExplorer/ArchiveExplorer";
 
 export default function Explorer() {
@@ -14,18 +14,18 @@ export default function Explorer() {
                         <div className="flex items-center bg-gray-100 border-none px-2 rounded-md w-100">
                             <input placeholder="Buscar" type="text"
                                    className="input bg-gray-100 text-black focus:outline-none focus:border-none border-none shadow-none w-full focus:shadow-none"/>
-                            <MagnifyingGlassIcon className="size-5 "></MagnifyingGlassIcon>
+                            <MagnifyingGlassIcon className="size-7 stroke-black hover:cursor-pointer"></MagnifyingGlassIcon>
                         </div>
                         <button className="p-4 bg-gray-100 rounded-md hover:cursor-pointer hover:bg-[#A7F1FB]"><FunnelIcon
-                            className="size-7 fill-gray-800" ></FunnelIcon></button>
+                            className="size-7 fill-white-200 stroke-black" ></FunnelIcon></button>
                         <button className="p-4 bg-gray-100 rounded-md hover:cursor-pointer hover:bg-[#A7F1FB]"><Squares2X2Icon
-                            className="size-7 bg-none fill-gray-800" ></Squares2X2Icon></button>
+                            className="size-7 bg-none fill-white-200 stroke-black" ></Squares2X2Icon></button>
                     </div>
                     <div className="flex mt-7 mb-7 ml-3 gap-1 items-center">
-                        <button className="text-3xl text-gray-500 font-bold cursor-pointer
-                                       px-3 py-2 rounded-md hover:bg-[#A7F1FB]">Archivos
+                        <button className="text-xl text-gray-500 font-bold cursor-pointer
+                                       px-3 py-2 rounded-md hover:text-gray-400">Archivos
                         </button>
-                        <ChevronRightIcon className="fill-gray-700 size-10 "></ChevronRightIcon>
+                        <ChevronRightIcon className="fill-gray-500 size-9 cursor-pointer"></ChevronRightIcon>
                     </div>
                     <ArchiveExplorer />
                 </div>

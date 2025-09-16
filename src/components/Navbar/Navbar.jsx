@@ -10,8 +10,8 @@ export default function Navbar() {
                     <img className="w-14 rounded-full"
                         alt="profile pic"
                         src="/images/girl-pic.jpg"/>
-                    <div className="flex flex-col justify-end text-end">
-                        <div className="font-bold text-lg">Lily Martinez</div>
+                    <div className="flex flex-col justify-end text-end hover:text-white">
+                        <div className="font-bold text-lg text-gray-500">Lily Martinez</div>
                         <div className="font-light text-gray-500">lily_martinez@soy.sena.edu.co</div>
                     </div>
                 </div>
