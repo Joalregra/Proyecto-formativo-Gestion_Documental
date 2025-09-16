@@ -7,9 +7,9 @@ import InboxMailCard from "@/components/InboxMailCard/InboxMailCard";
 
 export default function Inbox() {
     return (
-        <div className="w-full h-screen md:w-1/2 md:h-full bg-white flex flex-col items-center p-3 rounded-lg">
+        <div className="w-full md:w-1/3 bg-white flex flex-col p-3 rounded-lg h-[calc(90vh-90px)] md:h-auto justify-between items-center">
 
-            <div className="w-full">
+            <div className="w-full flex flex-col">
                 <h2 className="font-bold text-2xl mb-2 text-center">
                     Bandeja de Entrada
                 </h2>
@@ -35,37 +35,17 @@ export default function Inbox() {
                     className="flex my-2 w-full justify-between items-center"
                 >
                     <form className="flex gap-2 w-full overflow-x-auto no-scrollbar">
-                        <input
-                            className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap"
-                            type="checkbox"
-                            aria-label="Preguntas"
-                        />
-                        <input
-                            className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap"
-                            type="checkbox"
-                            aria-label="Quejas"
-                        />
-                        <input
-                            className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap"
-                            type="checkbox"
-                            aria-label="Reclamos"
-                        />
-                        <input
-                            className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap"
-                            type="checkbox"
-                            aria-label="Sugerencias"
-                        />
+                        <input className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap" type="checkbox" aria-label="Preguntas" />
+                        <input className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap" type="checkbox" aria-label="Quejas" />
+                        <input className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap" type="checkbox" aria-label="Reclamos" />
+                        <input className="btn rounded-xl checked:bg-senaGreen border-none py-2 px-4 whitespace-nowrap" type="checkbox" aria-label="Sugerencias" />
                     </form>
                     <button className="p-3 bg-gray-100 rounded-md ml-2 shrink-0">
                         <BarsArrowUpIcon className="size-5" />
                     </button>
                 </div>
 
-
-                <h3
-                    id="inbox-date"
-                    className="text-start w-full px-2 mt-4 font-bold"
-                >
+                <h3 id="inbox-date" className="text-start w-full px-2 mt-4 font-bold">
                     Agosto, 2025
                 </h3>
             </div>
@@ -84,3 +64,5 @@ export default function Inbox() {
         </div>
     );
 }
+
+

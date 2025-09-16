@@ -8,7 +8,7 @@ export default function InboxMailCard() {
 
 
             <div className="flex-1 min-w-0">
-                {/* Tags */}
+
                 <div
                     id="mail-card-tags"
                     className="flex flex-wrap items-start justify-between gap-2"
@@ -36,7 +36,7 @@ export default function InboxMailCard() {
                     </div>
                 </div>
 
-                {/* Asunto + descripción */}
+
                 <div id="mail-card-content" className="mt-2 mb-3 min-w-0">
                     <h3
                         id="mail-card-subject"
