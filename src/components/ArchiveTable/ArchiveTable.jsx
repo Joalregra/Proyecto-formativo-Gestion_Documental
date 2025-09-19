@@ -19,7 +19,7 @@ export default function ArchiveTable() {
                     </thead>
                     <tbody>
                     {Array.from({ length: 15 }).map((_, i) => (
-                        <tr key={i} className="odd:bg-gray-100 even:bg-gray-200 text-center">
+                        <tr key={i} className="odd:bg-gray-100 even:bg-gray-200 text-center hover:bg-senaLightBlue">
                             <td className="p-2">
                                 <input type="checkbox" className="checkbox" />
                             </td>

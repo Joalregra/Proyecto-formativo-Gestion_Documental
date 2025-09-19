@@ -7,7 +7,7 @@ import InboxMailCard from "@/components/InboxMailCard/InboxMailCard";
 
 export default function Inbox() {
     return (
-        <div className="w-full md:w-1/3 bg-white flex flex-col p-3 rounded-lg h-[calc(90vh-90px)] md:h-auto justify-between items-center">
+        <div className="w-full md:w-1/3 bg-white flex flex-col p-3 rounded-lg h-[calc(90vh-70px)] md:h-auto ml-1 justify-between items-center  ">
 
             <div className="w-full flex flex-col">
                 <h2 className="font-bold text-2xl mb-2 text-center">
