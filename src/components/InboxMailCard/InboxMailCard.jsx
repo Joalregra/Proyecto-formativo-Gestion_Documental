@@ -2,7 +2,7 @@ import { DocumentTextIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function InboxMailCard() {
     return (
-        <div className="w-full p-4 border border-senaWashedBlue bg-white rounded-lg flex items-center gap-3 mb-3 overflow-hidden">
+        <div className="w-full p-4 border border-senaWashedBlue bg-white rounded-lg flex items-center gap-3 mb-3 overflow-hidden cursor-pointer">
 
             <div id="selector" className="h-20 w-1 rounded-xl bg-senaWashedBlue shrink-0"></div>
 

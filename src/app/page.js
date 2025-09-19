@@ -10,7 +10,7 @@ export default function Home() {
             <Navbar></Navbar>
             <div className="flex">
                 <Sidebar></Sidebar>
-                <div className="flex h-[calc(100vh-80px-2.5rem)] w-[calc(100vw-80px)] bg-white m-5 rounded-lg">
+                <div className="flex h-[calc(100vh-80px-2.5rem)] w-[calc(107vw-80px)] bg-white m-5 rounded-lg">
                     <Inbox></Inbox>
                     <MailReader></MailReader>
                 </div>
