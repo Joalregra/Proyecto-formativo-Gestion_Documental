@@ -14,7 +14,7 @@ export default function Navbar() {
                     <div
                         tabIndex={0}
                         role="button"
-                        className="btn btn-ghost py-2 rounded-md gap-3 flex items-center"
+                        className="btn btn-ghost py-8 rounded-md gap-3 flex items-center"
                     >
 
                         <img
