@@ -60,7 +60,8 @@ export default function ArchiveExplorer() {
                                 <EllipsisVerticalIcon className="size-8  fill-gray-700"></EllipsisVerticalIcon>
                             </div>
                             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow-sm">
-                                <li><a> <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles</a></li>
+                                <li> <label htmlFor="my-drawer-4" className="flex items-center gap-2 cursor-pointer">
+                                    <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles </label></li>
                                 <li><a> <ArrowDownTrayIcon className="size-4  fill-gray-700"></ArrowDownTrayIcon> Descargar </a></li>
                             </ul>
                         </div>
@@ -88,7 +89,8 @@ export default function ArchiveExplorer() {
                                 <EllipsisVerticalIcon className="size-8  fill-gray-700"></EllipsisVerticalIcon>
                             </div>
                             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box w-40 z-56 p-2 shadow-sm">
-                                <li><a> <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles</a></li>
+                                <li> <label htmlFor="my-drawer-4" className="flex items-center gap-2 cursor-pointer">
+                                    <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles </label></li>
                                 <li><a> <ArrowDownTrayIcon className="size-4  fill-gray-700"></ArrowDownTrayIcon> Descargar </a></li>
                             </ul>
                         </div>
@@ -115,7 +117,8 @@ export default function ArchiveExplorer() {
                                 <EllipsisVerticalIcon className="size-8  fill-gray-700"></EllipsisVerticalIcon>
                             </div>
                             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow-sm">
-                                <li><a> <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles</a></li>
+                                <li> <label htmlFor="my-drawer-4" className="flex items-center gap-2 cursor-pointer">
+                                    <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles </label></li>
                                 <li><a> <ArrowDownTrayIcon className="size-4  fill-gray-700"></ArrowDownTrayIcon> Descargar </a></li>
                             </ul>
                         </div>
@@ -124,6 +127,21 @@ export default function ArchiveExplorer() {
                 </tr>
                 </tbody>
             </table>
+            <div className="drawer drawer-end">
+                <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+                <div className="drawer-content">
+                    {/* Page content here */}
+                </div>
+                <div className="drawer-side">
+                    <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
+                    <ul className="menu bg-base-200 text-base-content absolute top-25 h-200 w-110 p-4 rounded-md overflow-y-scroll">
+                    {/* Sidebar content here */}
+                    <div className="">
+
+                    </div>
+                    </ul>
+                </div>
+            </div>
         </div>
     )
 }
