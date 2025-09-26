@@ -53,7 +53,7 @@ export default function ArchiveExplorer() {
             setParentId(last ?? null);
             return next;
         });
-        setStackNames((prev) => {.
+        setStackNames((prev) => {
             const next = [...prev];
             next.pop();
             return next;
@@ -116,6 +116,7 @@ export default function ArchiveExplorer() {
                     <th>
                         <FolderIcon className="size-10 opacity-0" />
                     </th>
+                    <th>Sección</th>
                     <th>Nombre</th>
                     <th>Última Modificación</th>
                     <th>Tamaño</th>
@@ -140,6 +141,7 @@ export default function ArchiveExplorer() {
                         <td>
                             <FolderIcon className="size-10 fill-gray-700 cursor-pointer" />
                         </td>
+                        <td>{folder.codigo_documental ?? "--"}</td>
                         <td>{folder.name}</td>
                         <td>{new Date(folder.updated_at).toLocaleDateString()}</td>
                         <td>--</td>

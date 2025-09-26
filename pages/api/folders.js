@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const db = await connectDB();
 
     const { parent_id } = req.query;
-    let sql = "SELECT id, name, tipo AS type, NOW() AS updated_at FROM folders";
+    let sql = "SELECT id, name, codigo_documental, tipo AS type, NOW() AS updated_at FROM folders";
     const params = [];
 
     if (parent_id === undefined || parent_id === null || parent_id === "" || parent_id === "null") {
