@@ -1,4 +1,4 @@
-"use client"; // 👈 si usas App Router (Next.js 13+), debe ir en la PRIMERA línea del archivo
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -7,12 +7,14 @@ import {
     EllipsisVerticalIcon,
     FolderIcon,
     InformationCircleIcon,
+    ChevronRightIcon,
 } from "@heroicons/react/24/solid";
 
 export default function ArchiveExplorer() {
     const [folders, setFolders] = useState([]);
     const [parentId, setParentId] = useState(null); // null = raíz
-    const [stack, setStack] = useState([]); // historial para volver atrás
+    const [stack, setStack] = useState([]); // history to go back
+    const [stackNames, setStackNames] = useState([]); // names of the folder to user the breadcrumb
 
     useEffect(() => {
         const url = parentId === null ? "/api/folders" : `/api/folders?parent_id=${parentId}`;
@@ -38,8 +40,9 @@ export default function ArchiveExplorer() {
     }, [parentId]);
 
     const enterFolder = (folder) => {
-        if (folder?.type !== "carpeta") return; // solo navegar en carpetas
+        if (folder?.type !== "carpeta") return; // to navigate only to folders
         setStack((prev) => [...prev, parentId]);
+        setStackNames((prev) => [...prev, folder?.name ?? String(folder?.id ?? "")]);
         setParentId(folder.id);
     };
 
@@ -50,18 +53,54 @@ export default function ArchiveExplorer() {
             setParentId(last ?? null);
             return next;
         });
+        setStackNames((prev) => {.
+            const next = [...prev];
+            next.pop();
+            return next;
+        });
+    };
+
+    const handleBreadcrumbClick = (idx) => {
+        // Build array of folder IDs corresponding to breadcrumb items
+        const idsPath = [...stack.slice(1), parentId];
+        const targetId = idsPath[idx];
+        if (targetId === undefined || targetId === parentId) return; // no-op if current
+        setParentId(targetId ?? null);
+        setStack((prev) => prev.slice(0, idx + 1));
+        setStackNames((prev) => prev.slice(0, idx + 1));
     };
 
     return (
         <div className="overflow-x-auto w-full">
-            {/* Barra de navegación simple */}
-            <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-gray-600">
-                    Ruta: {stack.length === 0 ? "Raíz" : `…/${stack.filter(x => x !== null).join("/")}/${parentId ?? ""}`}
-                </div>
-                <div className="flex gap-2">
+            <div className="flex mt-7 mb-2 ml-3 gap-1 items-center">
+                <button
+                    className="text-xl text-gray-500 font-bold cursor-pointer px-3 py-2 rounded-md hover:text-gray-400"
+                    onClick={() => {
+                        setParentId(null);
+                        setStack([]);
+                        setStackNames([]);
+                    }}
+                >
+                    Archivos
+                </button>
+                {stackNames.map((name, idx) => (
+                    <span key={`${name}-${idx}`} className="flex items-center">
+                        <ChevronRightIcon className="size-5 cursor-pointer text-gray-500" />
+                        <button
+                            className="text-xl text-gray-500 font-bold cursor-pointer px-3 py-2 rounded-md hover:text-gray-400"
+                            onClick={() => handleBreadcrumbClick(idx)}
+                        >
+                            {name}
+                        </button>
+                    </span>
+                ))}
+
+                <div className="ml-auto flex gap-2">
                     {stack.length > 0 && (
-                        <button onClick={goBack} className="btn btn-sm">
+                        <button
+                            onClick={goBack}
+                            className="text-sm text-gray-600 px-3 py-2 rounded-md hover:text-gray-400"
+                        >
                             Atrás
                         </button>
                     )}
@@ -71,12 +110,11 @@ export default function ArchiveExplorer() {
             <table className="table border-separate border-spacing-y-2 w-full pb-15">
                 <thead className="sticky top-0">
                 <tr className="bg-gray-500 text-white text-lg">
-                    <th className="rounded-l-lg">
+                    <th className="rounded-l-lg p-2">
                         <input type="checkbox" className="checkbox border-white text-white" />
                     </th>
-                    <th className="flex items-center gap-5">
-                        <Bars3BottomLeftIcon className="size-10 cursor-pointer" />
-                        Sección
+                    <th>
+                        <FolderIcon className="size-10 opacity-0" />
                     </th>
                     <th>Nombre</th>
                     <th>Última Modificación</th>
@@ -92,10 +130,16 @@ export default function ArchiveExplorer() {
                         className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black cursor-pointer"
                         onClick={() => enterFolder(folder)}
                     >
-                        <td className="rounded-l-lg">
+                        <td className="rounded-l-lg p-2">
+                            <input
+                                type="checkbox"
+                                className="checkbox"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </td>
+                        <td>
                             <FolderIcon className="size-10 fill-gray-700 cursor-pointer" />
                         </td>
-                        <td>{folder.id}</td>
                         <td>{folder.name}</td>
                         <td>{new Date(folder.updated_at).toLocaleDateString()}</td>
                         <td>--</td>
