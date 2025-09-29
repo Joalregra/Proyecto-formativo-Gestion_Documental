@@ -229,7 +229,7 @@ export default function ArchiveExplorer() {
                         <ChevronRightIcon className="size-5 cursor-pointer text-gray-500" />
                         <button
                             className="text-xl text-gray-500 font-bold cursor-pointer px-3 py-2 rounded-md hover:text-gray-400"
-                            onClick={() => handleBreadcrumbClick(idx)}
+                            onDoubleClick={() => handleBreadcrumbClick(idx)}
                         >
                             {name}
                         </button>
@@ -239,7 +239,7 @@ export default function ArchiveExplorer() {
                 <div className="ml-auto flex gap-2">
                     {stack.length > 0 && (
                         <button
-                            onClick={goBack}
+                            onDoubleClick={goBack}
                             className="text-sm text-gray-600 px-3 py-2 rounded-md hover:text-gray-400"
                         >
                             Atrás
@@ -270,13 +270,13 @@ export default function ArchiveExplorer() {
                     <tr
                         key={folder.id}
                         className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black cursor-pointer"
-                        onClick={() => enterFolder(folder)}
+                        onDoubleClick={() => enterFolder(folder)}
                     >
                         <td className="rounded-l-lg p-2">
                             <input
                                 type="checkbox"
                                 className="checkbox"
-                                onClick={(e) => e.stopPropagation()}
+                                onDoubleClick={(e) => e.stopPropagation()}
                             />
                         </td>
                         <td>
