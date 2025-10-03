@@ -300,12 +300,8 @@ export default function ArchiveExplorer() {
                                     <EllipsisVerticalIcon className="size-8 fill-gray-700" />
                                 </div>
                                 <ul className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow-sm">
-                                    <li>
-                                        <a>
-                                            <InformationCircleIcon className="size-4 fill-gray-700" />
-                                            Detalles
-                                        </a>
-                                    </li>
+                                     <li> <label htmlFor="my-drawer-4" className="flex items-center gap-2 cursor-pointer">
+                                    <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles </label></li>
                                     <li>
                                         <a>
                                             <ArrowDownTrayIcon className="size-4 fill-gray-700" />
@@ -319,6 +315,63 @@ export default function ArchiveExplorer() {
                 ))}
                 </tbody>
             </table>
+            
+            <div className="drawer drawer-end">
+                <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+                
+                <div className="drawer-content">
+                    {/* Page content here */}
+                    {/* Ejemplo: un botón que abre el drawer */}
+                    <label htmlFor="my-drawer-4" className="btn">Abrir Detalles</label>
+                </div>
+
+                <div className="drawer-side">
+                    <label
+                    htmlFor="my-drawer-4"
+                    aria-label="close sidebar"
+                    className="drawer-overlay"
+                    ></label>
+
+                    <ul className="menu bg-base-200 text-base-content absolute top-25 h-200 w-110 p-4 rounded-md overflow-y-scroll">
+                    {/* Sidebar content here */}
+                    <div className="flex justify-center">
+                        
+                        <div className="max-w-xs mx-auto bg-white border rounded-lg shadow-sm p-4 text-center">
+                        {/* Icon */}
+                        <div className="w-full flex justify-center mb-2">
+                            <div className="border rounded-md p-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M10 4l2 2h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h6z"/>
+                            </svg>
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <h2 className="font-semibold text-gray-900 mb-3">Oficina de control interno</h2>
+
+                        {/* main info */}
+                        <div className="text-sm text-gray-700 space-y-1">
+                            <p><span className="font-medium">Tipo:</span> Carpeta</p>
+                            <p><span className="font-medium">Ultima Modificación:</span> 17/05/2025</p>
+                            <p><span className="font-medium">Abierto 2025 por</span> js@gmail.com</p>
+                            <p><span className="font-medium">Abierto</span> 26 Agosto 2025</p>
+                        </div>
+
+                        {/* separador */}
+                        <hr className="my-3"/>
+
+                        {/* Second Info */}
+                        <div className="text-sm text-gray-700 space-y-1 text-left">
+                            <p><span className="font-medium">Codigo seccion:</span> 100</p>
+                            <p><span className="font-medium">Series:</span> 07</p>
+                            <p><span className="font-medium">Subseries:</span> 08</p>
+                            <p><span className="font-medium">Tamaño:</span> 106 KB</p>
+                        </div>
+                        </div>
+                    </div>
+                    </ul>
+                </div>
+                </div>
         </div>
     );
 }
