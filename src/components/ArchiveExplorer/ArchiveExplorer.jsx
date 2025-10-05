@@ -6,7 +6,7 @@ import {
     EllipsisVerticalIcon,
     FolderIcon,
     InformationCircleIcon,
-    ChevronRightIcon,
+    ChevronRightIcon, DocumentIcon,
 } from "@heroicons/react/24/solid";
 
 export default function ArchiveExplorer() {
@@ -313,6 +313,63 @@ export default function ArchiveExplorer() {
                         </td>
                     </tr>
                 ))}
+                </tbody>
+            </table>
+            <table className="table border-separate border-spacing-y-2 w-full pb-15">
+                <thead className="sticky top-0">
+                <tr className="bg-gray-500 text-white text-lg">
+                    <th className="rounded-l-lg p-2">
+                        <input type="checkbox" className="checkbox border-white text-white" />
+                    </th>
+                    <th>
+                        <FolderIcon className="size-10 opacity-0" />
+                    </th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha de carga</th>
+                    <th>Tamaño</th>
+                    <th>Tipo</th>
+                    <th className="rounded-r-lg"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black cursor-pointer">
+                    <th className="rounded-l-lg p-2">
+                        <input type="checkbox" className="checkbox" />
+                    </th>
+                    <th>
+                        <DocumentIcon className="size-10 fill-gray-700 cursor-pointer" />
+                    </th>
+                    <td>3002085</td>
+                    <td>Acta_5 102033.pdf</td>
+                    <td>15/07/2025</td>
+                    <td>35KB</td>
+                    <td>Documento</td>
+                    <td className="flex justify-center gap-3 rounded-r-lg">
+                        <div className="border-none bg-transparent rounded-[50%] hover:bg-[#75D0D1]">
+                            <ArrowDownTrayIcon className="size-7 m-1 fill-gray-700" />
+                        </div>
+                        <div className="dropdown dropdown-end">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="border-none bg-transparent rounded-[50%] hover:bg-[#75D0D1]"
+                            >
+                                <EllipsisVerticalIcon className="size-8 fill-gray-700" />
+                            </div>
+                            <ul className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow-sm">
+                                <li> <label htmlFor="my-drawer-4" className="flex items-center gap-2 cursor-pointer">
+                                    <InformationCircleIcon className="size-4  fill-gray-700"></InformationCircleIcon> Detalles </label></li>
+                                <li>
+                                    <a>
+                                        <ArrowDownTrayIcon className="size-4 fill-gray-700" />
+                                        Descargar
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
                 </tbody>
             </table>
             
