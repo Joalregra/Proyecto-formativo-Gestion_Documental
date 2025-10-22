@@ -22,47 +22,60 @@ function formatSize(bytes) {
     return `${v % 1 === 0 ? v : v.toFixed(1)}${units[i]}`;
 }
 
-export default function ArchiveExplorer() {
+export default function ArchiveExplorer({ searchTerm, setSearchTerm }) {
     const [folders, setFolders] = useState([]);
     const [files, setFiles] = useState([]);
-    const [parentId, setParentId] = useState(null); // null = raíz
-    const [stack, setStack] = useState([]); // history to go back
-    const [stackNames, setStackNames] = useState([]); // names of the folder to user the breadcrumb
+    const [parentId, setParentId] = useState(null);
+    const [stack, setStack] = useState([]);
+    const [stackNames, setStackNames] = useState([]);
+
+    const isGlobalSearchActive = searchTerm && searchTerm.length > 0;
 
     useEffect(() => {
-        const url = parentId === null ? "/api/folders" : `/api/folders?parent_id=${parentId}`;
-        fetch(url)
+        let folderUrl = "/api/folders";
+        let fileUrl = "/api/files";
+
+        if (isGlobalSearchActive) {
+            folderUrl += `?name=${encodeURIComponent(searchTerm)}`;
+            fileUrl += `?name=${encodeURIComponent(searchTerm)}`;
+        } else {
+            const pidQuery = parentId === null ? "" : `?parent_id=${parentId}`;
+            folderUrl += pidQuery;
+            const fidQuery = parentId === null ? "" : `?folder_id=${parentId}`;
+            fileUrl += fidQuery;
+        }
+
+        fetch(folderUrl)
             .then(async (res) => {
                 if (!res.ok) {
-                    console.error("Failed to fetch", url, res.status, res.statusText);
+                    console.error("Failed to fetch folders", folderUrl, res.status, res.statusText);
                     return [];
                 }
                 try {
                     const data = await res.json();
                     return Array.isArray(data) ? data : [];
                 } catch (e) {
-                    console.error("Invalid JSON from", url, e);
+                    console.error("Invalid JSON from folders", folderUrl, e);
                     return [];
                 }
             })
             .then((data) => setFolders(Array.isArray(data) ? data : []))
             .catch((err) => {
-                console.error("fetch error:", err);
+                console.error("fetch folders error:", err);
                 setFolders([]);
             });
 
-        const urlFiles = parentId === null ? "/api/files" : `/api/files?folder_id=${parentId}`;
-        fetch(urlFiles)
+        fetch(fileUrl)
             .then(async (res) => {
                 if (!res.ok) {
-                    console.error("Failed to fetch", urlFiles, res.status, res.statusText);
+                    console.error("Failed to fetch files", fileUrl, res.status, res.statusText);
                     return [];
                 }
                 try {
                     const data = await res.json();
                     return Array.isArray(data) ? data : [];
                 } catch (e) {
-                    console.error("Invalid JSON from", urlFiles, e);
+                    console.error("Invalid JSON from files", fileUrl, e);
                     return [];
                 }
             })
@@ -71,16 +84,32 @@ export default function ArchiveExplorer() {
                 console.error("fetch files error:", err);
                 setFiles([]);
             });
-    }, [parentId]);
+
+    }, [parentId, searchTerm]);
+
+    const filteredFolders = folders;
+    const filteredFiles = files;
 
     const enterFolder = (folder) => {
-        if (folder?.type !== "carpeta") return; // to navigate only to folders
+        if (!folder || folder?.type !== "carpeta") return;
+
+        // If currently in search mode, we need to clear the search first
+        if (isGlobalSearchActive) {
+            if (setSearchTerm) setSearchTerm("");
+            setStack([]);
+            setStackNames([]);
+        }
+
+        // This is the common navigation step, regardless of previous state
+        // Add current folder to stack before moving to the child
         setStack((prev) => [...prev, parentId]);
         setStackNames((prev) => [...prev, folder?.name ?? String(folder?.id ?? "")]);
         setParentId(folder.id);
     };
 
     const goBack = () => {
+        if (isGlobalSearchActive) return;
+
         setStack((prev) => {
             const next = [...prev];
             const last = next.pop();
@@ -95,10 +124,11 @@ export default function ArchiveExplorer() {
     };
 
     const handleBreadcrumbClick = (idx) => {
-        // Build array of folder IDs corresponding to breadcrumb items
+        if (isGlobalSearchActive) return;
+
         const idsPath = [...stack.slice(1), parentId];
         const targetId = idsPath[idx];
-        if (targetId === undefined || targetId === parentId) return; // no-op if current
+        if (targetId === undefined || targetId === parentId) return;
         setParentId(targetId ?? null);
         setStack((prev) => prev.slice(0, idx + 1));
         setStackNames((prev) => prev.slice(0, idx + 1));
@@ -107,7 +137,6 @@ export default function ArchiveExplorer() {
     const [isOpen, setIsOpen] = useState(false);
     const [detailsItem, setDetailsItem] = useState(null);
 
-    // Helper to open the details drawer reliably and set the selected item
     const openDetails = (type, data) => {
         try {
             setDetailsItem({ type, data });
@@ -120,20 +149,18 @@ export default function ArchiveExplorer() {
         }
     };
 
-    // Cascading selects state for modal
-    const [options1, setOptions1] = useState([]); // root level
-    const [options2, setOptions2] = useState([]); // children of level 1
-    const [options3, setOptions3] = useState([]); // children of level 2
-    const [options4, setOptions4] = useState([]); // children of level 3
+    const [options1, setOptions1] = useState([]);
+    const [options2, setOptions2] = useState([]);
+    const [options3, setOptions3] = useState([]);
+    const [options4, setOptions4] = useState([]);
 
     const [sel1, setSel1] = useState("");
     const [sel2, setSel2] = useState("");
     const [sel3, setSel3] = useState("");
     const [sel4, setSel4] = useState("");
 
-    // Form fields
     const [fileName, setFileName] = useState("");
-    const [fileInput, setFileInput] = useState(null); // File object
+    const [fileInput, setFileInput] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [submitMsg, setSubmitMsg] = useState("");
 
@@ -152,11 +179,13 @@ export default function ArchiveExplorer() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitMsg("");
+        const folderIdToUse = deepestFolderId();
+
         if (!fileName.trim()) {
             setSubmitMsg("Por favor, ingresa el nombre del archivo.");
             return;
         }
-        if (!deepestFolderId()) {
+        if (!folderIdToUse) {
             setSubmitMsg("Selecciona al menos una carpeta destino.");
             return;
         }
@@ -164,16 +193,26 @@ export default function ArchiveExplorer() {
             setSubmitMsg("Selecciona un archivo para subir.");
             return;
         }
+
+        // --- Validation for PDF type ---
+        if (fileInput.type !== 'application/pdf') {
+            setSubmitMsg("Solo se permiten archivos PDF.");
+            return;
+        }
+        // --- End Validation ---
+
         try {
             setSubmitting(true);
             const base64 = await fileToBase64(fileInput);
             const payload = {
                 name: fileName.trim(),
-                folder_id: Number(deepestFolderId()),
+                folder_id: Number(folderIdToUse),
+                // Pass a specific 'tipo' override to the backend to save "PDF" instead of the full MIME type.
+                tipo: "PDF",
                 file: {
                     base64,
                     filename: fileInput.name,
-                    mimeType: fileInput.type,
+                    mimeType: fileInput.type, // Still pass the actual mime type for safety/backend check
                     size: fileInput.size,
                 },
             };
@@ -186,8 +225,9 @@ export default function ArchiveExplorer() {
                 const err = await res.json().catch(() => ({}));
                 throw new Error(err.error || `Fallo al guardar (${res.status})`);
             }
+
+            // --- Success Actions ---
             setSubmitMsg("Archivo guardado correctamente.");
-            // Reset form
             setFileName("");
             setSel1("");
             setSel2("");
@@ -197,8 +237,15 @@ export default function ArchiveExplorer() {
             setOptions3([]);
             setOptions4([]);
             setFileInput(null);
-            // Close modal after short delay
-            setTimeout(() => setIsOpen(false), 700);
+
+            // Close modal after success
+            setTimeout(() => {
+                setIsOpen(false);
+                setSubmitMsg(""); // Clear message after modal closes
+            }, 700);
+
+            // --- End Success Actions ---
+
         } catch (err) {
             console.error("Submit error:", err);
             setSubmitMsg(err.message || "Error inesperado guardando el archivo.");
@@ -207,7 +254,6 @@ export default function ArchiveExplorer() {
         }
     };
 
-    // Helper to fetch children by parent id (null for root)
     const fetchChildren = async (pid) => {
         const url = pid === null ? "/api/folders" : `/api/folders?parent_id=${pid}`;
         try {
@@ -215,20 +261,18 @@ export default function ArchiveExplorer() {
             if (!res.ok) return [];
             const data = await res.json();
             const arr = Array.isArray(data) ? data : [];
-            return arr.filter((it) => (it?.type ?? "").toLowerCase() === "carpeta");
+            return arr.filter((it) => (it?.type ?? it?.tipo ?? "").toLowerCase() === "carpeta");
         } catch (e) {
             console.error("fetchChildren error", e);
             return [];
         }
     };
 
-    // When modal opens, load root options
     useEffect(() => {
         if (!isOpen) return;
         (async () => {
             const root = await fetchChildren(null);
             setOptions1(root);
-            // reset selections and deeper options each time modal opens
             setSel1("");
             setSel2("");
             setSel3("");
@@ -286,186 +330,181 @@ export default function ArchiveExplorer() {
         setSel4(id);
     };
 
+
     return (
-
-
-
         <div className="overflow-x-auto w-full">
-                {/* Botón para abrir el modal */}
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="bg-senaGreen cursor-pointer hover:bg-green-700 text-white font-bold py-2 px-10 rounded-lg shadow-md"
-                >
-                    Abrir Formulario
-                </button>
+            <button
+                onClick={() => setIsOpen(true)}
+                className="bg-senaGreen cursor-pointer hover:bg-green-700 text-white font-bold py-2 px-10 rounded-lg shadow-md"
+            >
+                Abrir Formulario
+            </button>
 
-                {/* Modal */}
-                {isOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-                        <div className="relative flex flex-col items-center bg-white rounded-lg p-10 w-full max-w-2xl shadow-md">
+            {isOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="relative flex flex-col items-center bg-white rounded-lg p-10 w-full max-w-2xl shadow-md">
 
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl cursor-pointer"
-                            >
-                                ✖
-                            </button>
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl cursor-pointer"
+                        >
+                            ✖
+                        </button>
 
-                            <h1 className="font-bold text-2xl text-senaDarkGreen text-center mb-4">
-                                Guardar Archivo
-                            </h1>
+                        <h1 className="font-bold text-2xl text-senaDarkGreen text-center mb-4">
+                            Guardar Archivo
+                        </h1>
 
-                            <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
-                                <div className="w-full">
+                        <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
+                            <div className="w-full">
+                                <label
+                                    className="text-md font-light text-gray-600"
+                                    htmlFor="full-name"
+                                >
+                                    Nombre del Archivo
+                                </label>
+                                <input
+                                    id="full-name"
+                                    type="text"
+                                    className="input w-full py-2 mt-1"
+                                    placeholder="Escribe el nombre del archivo"
+                                    value={fileName}
+                                    onChange={(e) => setFileName(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
                                     <label
                                         className="text-md font-light text-gray-600"
-                                        htmlFor="full-name"
+                                        htmlFor="seccion"
                                     >
-                                        Nombre del Archivo
+                                        Sección
                                     </label>
-                                    <input
-                                        id="full-name"
-                                        type="text"
-                                        className="input w-full py-2 mt-1"
-                                        placeholder="Escribe el nombre del archivo"
-                                        value={fileName}
-                                        onChange={(e) => setFileName(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label
-                                            className="text-md font-light text-gray-600"
-                                            htmlFor="seccion"
-                                        >
-                                            Sección
-                                        </label>
-                                        <select
-                                            id="seccion"
-                                            value={sel1}
-                                            onChange={onChange1}
-                                            className="select w-full px-4 py-2 mt-1"
-                                        >
-                                            <option value="" disabled>
-                                                Seleccione...
-                                            </option>
-                                            {options1.map((opt) => (
-                                                <option key={opt.id} value={opt.id}>
-                                                    {opt.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            className="text-md font-light text-gray-600"
-                                            htmlFor="subseccion"
-                                        >
-                                            Sub Sección
-                                        </label>
-                                        <select
-                                            id="subseccion"
-                                            value={sel2}
-                                            onChange={onChange2}
-                                            className="select w-full px-4 py-2 mt-1"
-                                            disabled={!sel1 || options2.length === 0}
-                                        >
-                                            <option value="" disabled>
-                                                Seleccione...
-                                            </option>
-                                            {options2.map((opt) => (
-                                                <option key={opt.id} value={opt.id}>
-                                                    {opt.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            className="text-md font-light text-gray-600"
-                                            htmlFor="serie"
-                                        >
-                                            Serie
-                                        </label>
-                                        <select
-                                            id="serie"
-                                            value={sel3}
-                                            onChange={onChange3}
-                                            className="select w-full px-4 py-2 mt-1"
-                                            disabled={!sel2 || options3.length === 0}
-                                        >
-                                            <option value="" disabled>
-                                                Seleccione...
-                                            </option>
-                                            {options3.map((opt) => (
-                                                <option key={opt.id} value={opt.id}>
-                                                    {opt.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            className="text-md font-light text-gray-600"
-                                            htmlFor="subserie"
-                                        >
-                                            Sub Serie
-                                        </label>
-                                        <select
-                                            id="subserie"
-                                            value={sel4}
-                                            onChange={onChange4}
-                                            className="select w-full px-4 py-2 mt-1"
-                                            disabled={!sel3 || options4.length === 0}
-                                        >
-                                            <option value="" disabled>
-                                                Seleccione...
-                                            </option>
-                                            {options4.map((opt) => (
-                                                <option key={opt.id} value={opt.id}>
-                                                    {opt.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {/*
-
-                                File upload */}
-                                <div className="w-full">
-                                    <label className="text-md font-light text-gray-600" htmlFor="file">
-                                        Archivo
-                                    </label>
-                                    <input
-                                        id="file"
-                                        type="file"
-                                        className="input w-full py-2 mt-1"
-                                        onChange={(e) => setFileInput(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
-                                        accept="*/*"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col items-center mt-6 gap-2">
-                                    <button
-                                        type="submit"
-                                        disabled={submitting}
-                                        className={`bg-senaGreen ${submitting ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-green-700'} text-white font-bold py-2 px-16 rounded-lg transition`}
+                                    <select
+                                        id="seccion"
+                                        value={sel1}
+                                        onChange={onChange1}
+                                        className="select w-full px-4 py-2 mt-1"
                                     >
-                                        {submitting ? 'Guardando…' : 'Guardar'}
-                                    </button>
-                                    {submitMsg && (
-                                        <p className="text-sm text-gray-700">{submitMsg}</p>
-                                    )}
+                                        <option value="" disabled>
+                                            Seleccione...
+                                        </option>
+                                        {options1.map((opt) => (
+                                            <option key={opt.id} value={opt.id}>
+                                                {opt.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-                            </form>
-                        </div>
+
+                                <div>
+                                    <label
+                                        className="text-md font-light text-gray-600"
+                                        htmlFor="subseccion"
+                                    >
+                                        Sub Sección
+                                    </label>
+                                    <select
+                                        id="subseccion"
+                                        value={sel2}
+                                        onChange={onChange2}
+                                        className="select w-full px-4 py-2 mt-1"
+                                        disabled={!sel1 || options2.length === 0}
+                                    >
+                                        <option value="" disabled>
+                                            Seleccione...
+                                        </option>
+                                        {options2.map((opt) => (
+                                            <option key={opt.id} value={opt.id}>
+                                                {opt.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label
+                                        className="text-md font-light text-gray-600"
+                                        htmlFor="serie"
+                                    >
+                                        Serie
+                                    </label>
+                                    <select
+                                        id="serie"
+                                        value={sel3}
+                                        onChange={onChange3}
+                                        className="select w-full px-4 py-2 mt-1"
+                                        disabled={!sel2 || options3.length === 0}
+                                    >
+                                        <option value="" disabled>
+                                            Seleccione...
+                                        </option>
+                                        {options3.map((opt) => (
+                                            <option key={opt.id} value={opt.id}>
+                                                {opt.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label
+                                        className="text-md font-light text-gray-600"
+                                        htmlFor="subserie"
+                                    >
+                                        Sub Serie
+                                    </label>
+                                    <select
+                                        id="subserie"
+                                        value={sel4}
+                                        onChange={onChange4}
+                                        className="select w-full px-4 py-2 mt-1"
+                                        disabled={!sel3 || options4.length === 0}
+                                    >
+                                        <option value="" disabled>
+                                            Seleccione...
+                                        </option>
+                                        {options4.map((opt) => (
+                                            <option key={opt.id} value={opt.id}>
+                                                {opt.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="w-full">
+                                <label className="text-md font-light text-gray-600" htmlFor="file">
+                                    Archivo (Solo PDF)
+                                </label>
+                                <input
+                                    id="file"
+                                    type="file"
+                                    className="input w-full py-2 mt-1"
+                                    onChange={(e) => setFileInput(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                                    // --- ONLY ACCEPT PDF FILES ---
+                                    accept="application/pdf"
+                                    // --- END PDF ACCEPTANCE ---
+                                />
+                            </div>
+
+                            <div className="flex flex-col items-center mt-6 gap-2">
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className={`bg-senaGreen ${submitting ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-green-700'} text-white font-bold py-2 px-16 rounded-lg transition`}
+                                >
+                                    {submitting ? 'Guardando…' : 'Guardar'}
+                                </button>
+                                {submitMsg && (
+                                    <p className="text-sm text-gray-700">{submitMsg}</p>
+                                )}
+                            </div>
+                        </form>
                     </div>
-                )}
+                </div>
+            )}
             <div className="flex mt-7 mb-2 ml-3 gap-1 items-center">
                 <button
                     className="text-xl text-gray-500 font-bold cursor-pointer px-3 py-2 rounded-md hover:text-gray-400"
@@ -473,11 +512,12 @@ export default function ArchiveExplorer() {
                         setParentId(null);
                         setStack([]);
                         setStackNames([]);
+                        if (setSearchTerm) setSearchTerm("");
                     }}
                 >
                     Home
                 </button>
-                {stackNames.map((name, idx) => (
+                {!isGlobalSearchActive && stackNames.map((name, idx) => (
                     <span key={`${name}-${idx}`} className="flex items-center">
                         <ChevronRightIcon className="size-5 cursor-pointer text-gray-500" />
                         <button
@@ -488,9 +528,18 @@ export default function ArchiveExplorer() {
                         </button>
                     </span>
                 ))}
+                {isGlobalSearchActive && (
+                    <span className="flex items-center">
+                        <ChevronRightIcon className="size-5 text-gray-400" />
+                        <span className="text-xl text-senaDarkGreen font-bold px-3 py-2 rounded-md">
+                            Resultados de búsqueda: "{searchTerm}"
+                        </span>
+                    </span>
+                )}
+
 
                 <div className="ml-auto flex gap-2">
-                    {stack.length > 0 && (
+                    {stack.length > 0 && !isGlobalSearchActive && (
                         <button
                             onDoubleClick={goBack}
                             className="text-sm text-gray-600 px-3 py-2 rounded-md hover:text-gray-400"
@@ -519,7 +568,7 @@ export default function ArchiveExplorer() {
                 </tr>
                 </thead>
                 <tbody>
-                {(Array.isArray(folders) ? folders : []).map((folder) => (
+                {(Array.isArray(filteredFolders) ? filteredFolders : []).map((folder) => (
                     <tr
                         key={folder.id}
                         className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black cursor-pointer"
@@ -572,9 +621,8 @@ export default function ArchiveExplorer() {
                     </tr>
                 ))}
                 </tbody>
-                {/* Files list */}
                 <tbody className="overflow-y-70">
-                {(Array.isArray(files) ? files : []).map((file) => (
+                {(Array.isArray(filteredFiles) ? filteredFiles : []).map((file) => (
                     <tr key={file.id} className="odd:bg-gray-100 hover:bg-[#A7F1FB] even:bg-gray-200 text-black cursor-pointer">
                         <td className="rounded-l-lg p-2">
                             <input type="checkbox" className="checkbox" />
@@ -608,52 +656,46 @@ export default function ArchiveExplorer() {
             </table>
             <div className="drawer drawer-end">
                 <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-                
+
                 <div className="drawer-content">
-                    {/* Ejemplo: un botón que abre el drawer */}
                 </div>
 
                 <div className="drawer-side">
                     <label
-                    htmlFor="my-drawer-4"
-                    aria-label="close sidebar"
-                    className="drawer-overlay"
+                        htmlFor="my-drawer-4"
+                        aria-label="close sidebar"
+                        className="drawer-overlay"
                     ></label>
 
                     <label htmlFor="my-drawer-4" aria-label="close sidebar" className="w-full h-full flex items-center justify-center p-4 cursor-pointer">
                         <div className="max-w-xs w-full bg-white border rounded-lg shadow-sm p-4 text-center transform origin-center" style={{ transform: 'scale(1.44)' }} onClick={(e) => e.stopPropagation()}>
-                        {/* Icon */}
-                        <div className="w-full flex justify-center mb-2">
-                            <div className="border rounded-md p-6">
-                                {detailsItem?.type === 'folder' ? (
-                                    <FolderIcon className="w-12 h-12 text-gray-600" />
-                                ) : (
-                                    <DocumentIcon className="w-12 h-12 text-gray-600" />
-                                )}
+                            <div className="w-full flex justify-center mb-2">
+                                <div className="border rounded-md p-6">
+                                    {detailsItem?.type === 'folder' ? (
+                                        <FolderIcon className="w-12 h-12 text-gray-600" />
+                                    ) : (
+                                        <DocumentIcon className="w-12 h-12 text-gray-600" />
+                                    )}
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Title */}
-                        <h2 className="font-semibold text-gray-900 mb-3">{detailsItem?.data?.name || 'Detalles'}</h2>
+                            <h2 className="font-semibold text-gray-900 mb-3">{detailsItem?.data?.name || 'Detalles'}</h2>
 
-                        {/* main info */}
-                        <div className="text-sm text-gray-700 space-y-1">
-                            <p><span className="font-medium">Tipo:</span> {detailsItem?.type === 'folder' ? 'Carpeta' : (detailsItem?.data?.tipo || 'Archivo')}</p>
-                            <p><span className="font-medium">Última Modificación:</span> {(() => { const d = detailsItem?.data?.updated_at || detailsItem?.data?.created_at; return d ? new Date(d).toLocaleDateString() : '--'; })()}</p>
-                            <p><span className="font-medium">Abierto 2025 por</span> {detailsItem?.data?.opened_by || 'js@gmail.com'}</p>
-                            <p><span className="font-medium">Abierto</span> {detailsItem?.data?.opened_at ? new Date(detailsItem.data.opened_at).toLocaleDateString() : '26 Agosto 2025'}</p>
-                        </div>
+                            <div className="text-sm text-gray-700 space-y-1">
+                                <p><span className="font-medium">Tipo:</span> {detailsItem?.type === 'folder' ? 'Carpeta' : (detailsItem?.data?.tipo || 'Archivo')}</p>
+                                <p><span className="font-medium">Última Modificación:</span> {(() => { const d = detailsItem?.data?.updated_at || detailsItem?.data?.created_at; return d ? new Date(d).toLocaleDateString() : '--'; })()}</p>
+                                <p><span className="font-medium">Abierto 2025 por</span> {detailsItem?.data?.opened_by || 'js@gmail.com'}</p>
+                                <p><span className="font-medium">Abierto</span> {detailsItem?.data?.opened_at ? new Date(detailsItem.data.opened_at).toLocaleDateString() : '26 Agosto 2025'}</p>
+                            </div>
 
-                        {/* separador */}
-                        <hr className="my-3"/>
+                            <hr className="my-3"/>
 
-                        {/* Second Info */}
-                        <div className="text-sm text-gray-700 space-y-1 text-left">
-                            <p><span className="font-medium">Código sección:</span> {detailsItem?.data?.codigo_documental ?? '--'}</p>
-                            <p><span className="font-medium">Series:</span> {detailsItem?.data?.series ?? '--'}</p>
-                            <p><span className="font-medium">Subseries:</span> {detailsItem?.data?.subseries ?? '--'}</p>
-                            <p><span className="font-medium">Tamaño:</span> {detailsItem?.type === 'folder' ? '--' : formatSize(detailsItem?.data?.size)}</p>
-                        </div>
+                            <div className="text-sm text-gray-700 space-y-1 text-left">
+                                <p><span className="font-medium">Código sección:</span> {detailsItem?.data?.codigo_documental ?? '--'}</p>
+                                <p><span className="font-medium">Series:</span> {detailsItem?.data?.series ?? '--'}</p>
+                                <p><span className="font-medium">Subseries:</span> {detailsItem?.data?.subseries ?? '--'}</p>
+                                <p><span className="font-medium">Tamaño:</span> {detailsItem?.type === 'folder' ? '--' : formatSize(detailsItem?.data?.size)}</p>
+                            </div>
                         </div>
                     </label>
                 </div>
