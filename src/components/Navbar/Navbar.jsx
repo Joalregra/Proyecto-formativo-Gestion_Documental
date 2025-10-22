@@ -26,7 +26,7 @@ export default function Navbar() {
 
                         <div className="hidden sm:flex flex-col justify-end text-end">
                             <div className="font-bold text-sm md:text-lg text-black">
-                                Lily Martinez
+                                Lily Martineez
                             </div>
                             <div className="font-light text-xs md:text-sm text-gray-500 truncate max-w-[150px] md:max-w-none">
                                 lily_martinez@soy.sena.edu.co
@@ -56,6 +56,3 @@ export default function Navbar() {
         </nav>
     );
 }
-
-
-
